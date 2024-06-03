@@ -4,11 +4,13 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from django.contrib import messages
 from .forms import SignUpForm
+from .models import Records
 
 # Create your views here.
 
 
 def home(request):
+    Datas = Records.objects.all()
     if request.method == "POST":
         uName = request.POST.get('UserName')
         passd = request.POST.get('PASS')
@@ -25,7 +27,7 @@ def home(request):
             return redirect('home')
     else:
 
-        return render(request,'home.html',{})
+        return render(request,'home.html',{'Records':Datas})
 
 def login_user(request):
     pass
