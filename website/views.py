@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.models import User
 from django.contrib import admin
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import SignUpForm , AddRecordForm
 from .models import Records
 
 # Create your views here.
@@ -52,3 +52,49 @@ def register_user(request):
         form = SignUpForm()
         return render(request, 'register.html',{'form':form})
     return render(request, 'register.html',{'form':form})
+
+def customer_record(request,pk):
+    if request.user.is_authenticated:
+       customer_data = Records.objects.get(id=pk)
+       return render(request, 'record.html',{'customer_data':customer_data})
+    else:
+        messages.success(request, 'You have to login First') 
+        return redirect('home')
+
+def delete_record(request,pk):    
+    if request.user.is_authenticated:
+        delete_data = Records.objects.get(id=pk)
+        delete_data.delete()
+        messages.success(request,"You have Deleted successfully") 
+        return redirect('home')
+    else:
+        messages.success(request, 'You have to login First') 
+        return redirect('home')
+    
+def add_record(request):
+    form = AddRecordForm(request.POST or None)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if form.is_valid():
+                add_record = form.save()
+                messages.success(request,"Record Added successfully" ) 
+                return redirect('home')
+        return render(request,'add_record.html',{'form':form})  
+    else:
+        messages.success(request, 'You have to login First') 
+        return redirect('home')
+    
+def update_record(request,pk):
+   
+        if request.user.is_authenticated:
+            current_record = Records.objects.get(id=pk)
+            form = AddRecordForm(request.POST or None, instance=current_record)
+            if form.is_valid():
+                form.save()
+                messages.success(request,"Record Updated successfully" )
+                return redirect('home') 
+            return render(request,'update.html',{'form':form})
+        else:
+            messages.success(request, 'You have to login First') 
+            return redirect('home')
+    
